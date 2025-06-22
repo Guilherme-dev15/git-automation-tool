@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Use fzf to select a branch from the list of git branches with preview of recent commits
-selected=$(git branch | fzf \
+selected=$(git branch | fzf +m \
     --height 40% \
     --layout=reverse \
     --border \
@@ -9,6 +9,12 @@ selected=$(git branch | fzf \
     --color bg:#222222,preview-bg:#333333
 )
 
+
+if [$? eq 127]; then
+	echo "Exiting..."
+	exit 1
+fi
+	
 # Remove the leading '* ' if the branch is currently checked out
 selected=$(echo "$selected" | tr -d '* ')
 
