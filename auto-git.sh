@@ -50,7 +50,7 @@ function merge_branch() {
         --height=100% \
         --layout=reverse \
         --border \
-        --preview 'git diff $(git branch --show-current) $(echo {} | tr -d "* ")' \
+        --preview 'git -c color .ui=aways diff $(git branch grep "^*" | tr -d "* ") $(echo {} | tr -d "* ")' \
         --color bg:#222222,preview-bg:#333333
     )
     exit_exception $?
