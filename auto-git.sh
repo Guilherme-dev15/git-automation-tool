@@ -64,6 +64,7 @@ function merge_branch() {
 
     echo "🔀 Fazendo merge da branch '$selected' na branch atual..."
     git merge "$selected"
+    echo "teste"
 }
 
 # Menu de ações
