@@ -1,7 +1,22 @@
 #!/bin/bash
 
+function exit_exception (){
+    local status=$1
+    if [ $status -ne 0 ]; then
+        echo "Exiting..."
+        exit 1
+    fi
+}
+
+function has_local_changes() {
+    if ! git diff --quiet || ! git diff --cached --quiet; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 function switch_branch(){
-    # Use fzf para selecionar uma branch com preview dos últimos commits
     selected=$(git branch | fzf +m \
         --height 40% \
         --layout=reverse \
@@ -10,14 +25,15 @@ function switch_branch(){
         --color bg:#222222,preview-bg:#333333
     )
 
-    # Verifica se o fzf foi cancelado (código de saída diferente de zero)
-    if [ $? -ne 0 ]; then
-        echo "Exiting..."
+    exit_exception $?
+
+    selected=$(echo "$selected" | tr -d '* ')
+
+    # Verifica se há mudanças locais antes de trocar
+    if has_local_changes; then
+        echo "Você tem mudanças locais não commitadas. Por favor, commit ou stash antes de trocar de branch."
         exit 1
     fi
-
-    # Remove o '* ' do branch selecionado (caso seja a branch atual)
-    selected=$(echo "$selected" | tr -d '* ')
 
     echo "Switching to branch: $selected"
 
