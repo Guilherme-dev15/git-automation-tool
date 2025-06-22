@@ -36,11 +36,11 @@ function switch_branch() {
     selected=$(echo "$selected" | tr -d '* ')
 
     if has_local_changes; then
-        echo "Você tem mudanças locais não commitadas. Por favor, commit ou stash antes de trocar de branch."
+        echo "⚠️  Você tem mudanças locais não commitadas. Por favor, commit ou stash antes de trocar de branch."
         exit 1
     fi
 
-    echo "Switching to branch: $selected"
+    echo "🔁 Switch para a branch: $selected"
     git switch "$selected"
 }
 
@@ -50,7 +50,7 @@ function merge_branch() {
         --height=100% \
         --layout=reverse \
         --border \
-        --preview 'git -c color .ui=always diff $(git branch grep "^*" | tr -d "* ") $(echo {} | tr -d "* ")' \
+        --preview 'git diff $(git branch --show-current) $(echo {} | tr -d "* ")' \
         --color bg:#222222,preview-bg:#333333
     )
     exit_exception $?
@@ -58,14 +58,40 @@ function merge_branch() {
     selected=$(echo "$selected" | tr -d '* ')
 
     if has_local_changes; then
-        echo "Você tem mudanças locais não commitadas. Por favor, commit ou stash antes de fazer merge."
+        echo "⚠️  Você tem mudanças locais não commitadas. Por favor, commit ou stash antes de fazer merge."
         exit 1
     fi
 
-    echo "Fazendo merge da branch '$selected' na atual..."
+    echo "🔀 Fazendo merge da branch '$selected' na branch atual..."
     git merge "$selected"
 }
 
-# Exemplo de uso
-switch_branch
-# merge_branch  # Descomente para usar
+# Menu de ações
+function main_menu() {
+    action=$(echo -e "Switch Branch\nMerge Branch\nSair" | fzf \
+        --height=20% \
+        --layout=reverse \
+        --border \
+        --color bg:#222222,preview-bg:#333333 \
+        --prompt="📦 Selecione uma ação: ")
+
+    case "$action" in
+        "Switch Branch")
+            switch_branch
+            ;;
+        "Merge Branch")
+            merge_branch
+            ;;
+        "Sair")
+            echo "🚪 Saindo..."
+            exit 0
+            ;;
+        *)
+            echo "❌ Ação inválida."
+            exit 1
+            ;;
+    esac
+}
+
+# Executa o menu
+main_menu
