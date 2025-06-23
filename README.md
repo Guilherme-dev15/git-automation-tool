@@ -40,7 +40,7 @@ $ gitmenu
 ### 1. Clone este repositório
 
 ```bash
-git clone https://github.com/SEU_USUARIO/git-automation-cli.git
+git clone https://github.com/Guilherme-dev15/git-automation-tool.git
 cd git-automation-cli
 ```
 
