@@ -31,7 +31,6 @@ Uma ferramenta interativa no terminal para gerenciar branches do Git de forma r√
 git clone https://github.com/Guilherme-dev15/git-automation-tool.git
 cd git-automation-cli
 ```
-
 ### 2. Torne o script execut√°vel e mova para o PATH
 
 ```bash
