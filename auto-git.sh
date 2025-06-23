@@ -1,150 +1,94 @@
-#!/bin/bash
+# 🧠 Git Automation CLI – `gitmenu`
 
-# ========== 🧪 Git Repository Validation ==========
-function validate_git_repository() {
-    git status &>/dev/null
-    if [ $? -eq 128 ]; then
-        echo -e "\033[1;31m❌ Error: This is not a Git repository.\033[0m"
-        echo -e "Please navigate into a Git repository folder and try again."
-        exit 1
-    fi
-}
+An interactive Git branch management tool built with Bash + FZF.  
+Ideal for developers who want a faster, cleaner and safer way to switch, merge or delete branches — with live previews, color UI, and full Git validation.
 
-# ========== ⚙️ Utilities ==========
-function exit_exception () {
-    local status=$1
-    if [ $status -ne 0 ]; then
-        echo -e "\033[1;31m❌ Operation cancelled.\033[0m"
-        exit 1
-    fi
-}
+![GitMenu Demo](./demo.gif)
 
-function has_local_changes() {
-    ! git diff --quiet || ! git diff --cached --quiet
-}
+---
 
-function current_branch() {
-    git branch --show-current
-}
+## 🚀 Features
 
-function print_header() {
-    echo -e "\n\033[1;35m$1\033[0m"
-    echo
-}
+- ✅ Switch branches with live log previews  
+- ✅ Merge branches with visual `git diff` preview  
+- ✅ Delete branches with confirmation and history preview  
+- ✅ Detects if you're inside a valid Git repository  
+- ✅ Fully color-coded and keyboard-navigable with FZF  
+- ✅ Shell Script only — no Node, Python, or dependencies  
+- ✅ 100% English UI, beginner and team-friendly  
 
-# ========== 🔁 Switch Git Branch ==========
-function switch_branch() {
-    print_header "🔁 SWITCH BRANCH"
-    echo -e "📍 You are currently on: \033[1;36m$(current_branch)\033[0m"
+---
 
-    selected=$(git branch | fzf +m \
-        --header="🔁 Select a branch to switch to" \
-        --height=50% \
-        --layout=reverse \
-        --border \
-        --ansi \
-        --preview 'echo -e "\033[1;36mPurpose:\033[0m\nChange your working branch.\n\n\033[1;32mTip:\033[0m Ensure there are no uncommitted changes.\n\n\033[1;34mBranch Preview:\033[0m\n$(git log --oneline --graph --decorate --color=always $(echo {} | tr -d "* "))"' \
-        --color fg:#ffffff,bg:#1e1e1e,preview-bg:#2e2e2e,hl:#00ffff,fg+:#00ff00,bg+:#333333
-    )
-    exit_exception $?
+## 🛠️ Why it matters
 
-    selected=$(echo "$selected" | tr -d '* ')
-    echo -e "✅ You selected: \033[1;32m$selected\033[0m"
+**Tired of memorizing Git commands or dealing with merge conflicts without context?**  
+This tool simplifies branch navigation and merging while remaining 100% terminal-native.
 
-    if has_local_changes; then
-        echo -e "\033[1;33m⚠️ Local changes detected. Please commit or stash them first.\033[0m"
-        exit 1
-    fi
+No aliases, no wrappers. Just clean Bash with `fzf`.
 
-    git switch "$selected"
-    echo -e "\n✅ Switched to branch: \033[1;36m$selected\033[0m"
-}
+---
 
-# ========== 🔀 Merge Branch ==========
-function merge_branch() {
-    print_header "🔀 MERGE BRANCH"
-    echo -e "📍 Current branch: \033[1;36m$(current_branch)\033[0m"
+## 💻 How it works
 
-    selected=$(git branch | fzf +m \
-        --header="🔀 Select a branch to merge into current" \
-        --height=50% \
-        --layout=reverse \
-        --border \
-        --ansi \
-        --preview 'echo -e "\033[1;36mPurpose:\033[0m\nMerge selected branch into current one.\n\n\033[1;33mImportant:\033[0m Make sure the working directory is clean.\n\n\033[1;34mDifference Preview:\033[0m\n$(git diff --color $(git branch --show-current) $(echo {} | tr -d "* "))"' \
-        --color fg:#ffffff,bg:#1e1e1e,preview-bg:#2e2e2e,hl:#ffcc00,fg+:#00ff00,bg+:#444444
-    )
-    exit_exception $?
+| Action        | Description                                                             |
+|---------------|-------------------------------------------------------------------------|
+| 🔁 Switch      | Browse all local branches with log preview before switching             |
+| 🔀 Merge       | Choose a branch to merge into the current one, with visual `git diff`   |
+| 🗑️ Delete      | Safely delete local branches with preview and confirmation              |
+| 🚪 Exit        | Gracefully exits the tool                                               |
+| 🧪 Validate    | Ensures you're inside a Git project before running any command          |
 
-    selected=$(echo "$selected" | tr -d '* ')
-    echo -e "✅ You selected to merge: \033[1;32m$selected\033[0m"
+---
 
-    if has_local_changes; then
-        echo -e "\033[1;33m⚠️ Uncommitted changes detected. Please commit or stash first.\033[0m"
-        exit 1
-    fi
+## ⚡ Quick Demo (Typical Use Case)
 
-    echo -e "\n🔃 Merging \033[1;32m$selected\033[0m into \033[1;36m$(current_branch)\033[0m..."
-    git merge "$selected"
-}
+```bash
+# You're in 'develop' and want to push changes to 'main'
 
-# ========== 🗑️ Delete Branch ==========
-function delete_branch() {
-    print_header "🗑️ DELETE BRANCH"
-    echo -e "📍 Current branch: \033[1;36m$(current_branch)\033[0m"
+git add .
+git commit -m "Finish feature"
 
-    selected=$(git branch | grep -v '^\*' | fzf +m \
-        --header="🗑️ Select a branch to delete (cannot delete current)" \
-        --height=50% \
-        --layout=reverse \
-        --border \
-        --ansi \
-        --preview 'echo -e "\033[1;31mWARNING:\033[0m This action is irreversible.\n\n\033[1;36mBranch Info:\033[0m\n$(git log --oneline --color=always $(echo {} | tr -d "* "))"' \
-        --color fg:#ffffff,bg:#1e1e1e,preview-bg:#2e2e2e,hl:#ff5555,fg+:#ff3333,bg+:#333333
-    )
-    exit_exception $?
+gitmenu        # Choose 🔁 Switch to 'main'
+gitmenu        # Choose 🔀 Merge 'develop' into 'main'
+git push origin main
+📦 Installation
+1. Clone the repository
+bash
+Copy
+Edit
+git clone https://github.com/Guilherme-dev15/git-automation-tool.git
+cd git-automation-tool
+2. Make it executable and install
+bash
+Copy
+Edit
+chmod +x gitmenu
+mv gitmenu ~/.local/bin/
+Ensure ~/.local/bin is in your $PATH. If not, add this to your ~/.bashrc or ~/.zshrc:
 
-    selected=$(echo "$selected" | tr -d '* ')
-    echo -e "⚠️ You selected to delete: \033[1;31m$selected\033[0m"
+bash
+Copy
+Edit
+export PATH="$HOME/.local/bin:$PATH"
+3. Run from anywhere
+bash
+Copy
+Edit
+gitmenu
+🧩 Requirements
+Git
 
-    echo -e "\n\033[1;33mAre you sure?\033[0m Type \033[1;31mYES\033[0m to confirm:"
-    read -r confirm
+fzf
 
-    if [[ "$confirm" == "YES" ]]; then
-        git branch -D "$selected"
-        echo -e "\033[1;31m🗑️ Branch '$selected' deleted.\033[0m"
-    else
-        echo -e "\033[1;32m✅ Cancelled. No changes made.\033[0m"
-    fi
-}
+Bash 4+
 
-# ========== 📦 Main Menu ==========
-function main_menu() {
-    while true; do
-        action=$(echo -e "🔁 Switch Branch\n🔀 Merge Branch\n🗑️ Delete Branch\n🚪 Exit" | fzf \
-            --header="📦 MAIN MENU — Use arrows ↑↓ to navigate, Enter to select" \
-            --height=40% \
-            --layout=reverse \
-            --border \
-            --ansi \
-            --preview 'echo -e "\033[1;36mGit Assistant:\033[0m\n\n🔁 Switch Branch:\n  Move between Git branches.\n\n🔀 Merge Branch:\n  Merge another branch into the current one.\n\n🗑️ Delete Branch:\n  Remove local branch (irreversible).\n\n🚪 Exit:\n  Quit the tool."' \
-            --color fg:#ffffff,bg:#1e1e1e,fg+:#00ffcc,bg+:#2a2a2a,hl:#ffff00,preview-bg:#2e2e2e \
-            --prompt="👉 Choose: ")
+Linux, WSL or macOS terminal
 
-        case "$action" in
-            "🔁 Switch Branch") switch_branch ;;
-            "🔀 Merge Branch") merge_branch ;;
-            "🗑️ Delete Branch") delete_branch ;;
-            "🚪 Exit")
-                echo -e "\033[1;34m👋 Goodbye!\033[0m"
-                break
-                ;;
-            *) echo -e "\033[1;31m❌ Invalid option.\033[0m";;
-        esac
-    done
-}
-
-# ========== 🚀 Start ==========
-validate_git_repository
-main_menu
-
+📁 Project Structure
+bash
+Copy
+Edit
+.
+├── gitmenu          # Main script (auto-git.sh renamed)
+├── README.md        # Project documentation
+├── demo.gif         # Visual demo of usage
