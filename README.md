@@ -18,21 +18,9 @@ Uma ferramenta interativa no terminal para gerenciar branches do Git de forma r�
 
 ---
 
-## 🖼️ Exemplo visual (em breve GIF)
+## 🖼️ Exemplo visual 
 
-```bash
-$ gitmenu
-
-📦 MAIN MENU
-🔁 Switch Branch
-🔀 Merge Branch
-🗑️ Delete Branch
-🚪 Exit
-
-📍 Current Branch: develop
-👁️ Preview: git log --oneline --graph --color
-````
-
+![Demonstração do GitMenu](./demo.gif)
 ---
 
 ## 📦 Instalação
