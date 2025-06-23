@@ -1,6 +1,5 @@
 ## 📄 `README.md` EM PORTUGUÊS
 
-````markdown
 # 🧠 GitMenu – Automação de Branches via Terminal
 
 Uma ferramenta interativa no terminal para gerenciar branches do Git de forma rápida, segura e visual. Troque, faça merge e exclua branches com menus coloridos usando [FZF](https://github.com/junegunn/fzf), com pré-visualização ao vivo e interface amigável para todos os níveis de usuário.
